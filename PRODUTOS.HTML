@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Produtos</title>
+    <style>
+        /* --- RESET E VARIÁVEIS --- */
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #d1d5db;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        /* --- CONTAINER DO FORMULÁRIO --- */
+        .form-container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .form-header {
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 16px;
+        }
+
+        .form-header h1 {
+            font-size: 24px;
+            color: var(--text-main);
+        }
+
+        .form-header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* --- GRID E CAMPOS --- */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        input, select, textarea {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: #fff;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* --- UPLOAD DE IMAGEM --- */
+        .image-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            position: relative;
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--primary-color);
+        }
+
+        .image-upload-area input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 24px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .upload-text span {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 15px;
+            border-radius: 6px;
+            display: none;
+            object-fit: cover;
+        }
+
+        /* --- BOTÕES --- */
+        .form-actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        button {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-color);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* --- TOAST DE SUCESSO --- */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--success-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        /* --- RESPONSIVIDADE --- */
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-actions {
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <div class="form-header">
+            <h1>Cadastrar Novo Produto</h1>
+            <p>Preencha as informações abaixo para adicionar um produto ao seu catálogo.</p>
+        </div>
+
+        <form id="productForm">
+            <div class="form-grid">
+                <!-- Nome do Produto -->
+                <div class="form-group full-width">
+                    <label for="productName">Nome do Produto *</label>
+                    <input type="text" id="productName" name="productName" placeholder="Ex: Camiseta Básica Algodão" required>
+                </div>
+
+                <!-- Categoria e SKU -->
+                <div class="form-group">
+                    <label for="category">Categoria *</label>
+                    <select id="category" name="category" required>
+                        <option value="" disabled selected>Selecione...</option>
+                        <option value="roupas">Roupas</option>
+                        <option value="eletronicos">Eletrônicos</option>
+                        <option value="casa">Casa e Decoração</option>
+                        <option value="esportes">Esportes</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sku">Código / SKU</label>
+                    <input type="text" id="sku" name="sku" placeholder="Ex: CAM-001">
+                </div>
+
+                <!-- Preço e Estoque -->
+                <div class="form-group">
+                    <label for="price">Preço (R$) *</label>
+                    <input type="number" id="price" name="price" step="0.01" min="0" placeholder="0,00" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="stock">Estoque *</label>
+                    <input type="number" id="stock" name="stock" min="0" placeholder="0" required>
+                </div>
+
+                <!-- Descrição -->
+                <div class="form-group full-width">
+                    <label for="description">Descrição</label>
+                    <textarea id="description" name="description" placeholder="Descreva os detalhes, materiais e dimensões do produto..."></textarea>
+                </div>
+
+                <!-- Upload de Imagem -->
+                <div class="form-group full-width">
+                    <label>Imagem do Produto</label>
+                    <div class="image-upload-area">
+                        <input type="file" id="productImage" name="productImage" accept="image/*">
+                        <div class="upload-icon">📷</div>
+                        <div class="upload-text">
+                            <span>Clique para enviar</span> ou arraste uma imagem
+                            <br><small>PNG, JPG ou WEBP (Máx. 5MB)</small>
+                        </div>
+                    </div>
+                    <img id="imagePreview" alt="Pré-visualização da imagem">
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="form-actions">
+                <button type="reset" class="btn-secondary">Limpar</button>
+                <button type="submit" class="btn-primary">Cadastrar Produto</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Toast de Notificação -->
+    <div id="toast" class="toast">Produto cadastrado com sucesso!</div>
+
+    <script>
+        // --- LÓGICA DE PRÉ-VISUALIZAÇÃO DA IMAGEM ---
+        const imageInput = document.getElementById('productImage');
+        const imagePreview = document.getElementById('imagePreview');
+
+        imageInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Verifica o tamanho (ex: 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert("A imagem é muito grande! O limite é 5MB.");
+                    imageInput.value = ""; // Limpa o input
+                    imagePreview.style.display = 'none';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.style.display = 'none';
+            }
+        });
+
+        // --- LÓGICA DE SUBMISSÃO DO FORMULÁRIO ---
+        const form = document.getElementById('productForm');
+        const toast = document.getElementById('toast');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Impede o recarregamento da página
+
+            // Coletando os dados do formulário
+            const formData = new FormData(form);
+            const productData = Object.fromEntries(formData.entries());
+            
+            // Adicionando a URL da imagem (em base64) para fins de demonstração
+            if (imagePreview.src) {
+                productData.imageBase64 = imagePreview.src;
+            }
+
+            console.log("Dados do Produto para enviar ao Backend:", productData);
+
+            // --- SIMULAÇÃO DE ENVIO PARA O SERVIDOR ---
+            // Aqui você faria um fetch() para sua API (Node.js, PHP, Python, etc.)
+            /*
+            fetch('/api/products', {
+                method: 'POST',
+                body: formData // Se estiver enviando arquivos reais (multipart/form-data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                showToast("Produto salvo com sucesso!");
+                form.reset();
+                imagePreview.style.display = 'none';
+            })
+            .catch(error => console.error('Erro:', error));
+            */
+
+            // Exibindo notificação de sucesso (Mock)
+            showToast("Produto cadastrado com sucesso!");
+            form.reset();
+            imagePreview.style.display = 'none';
+        });
+
+        // Função para mostrar o Toast
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
